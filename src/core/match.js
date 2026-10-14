@@ -99,5 +99,10 @@ export function createMatch({ candidateIds, target, turnPolicy, historyLimit = 4
     reset() {
       load();
     },
+
+    /** Updates match state from synchronized state. */
+    syncState(next = {}) {
+      load(next);
+    },
   };
 }

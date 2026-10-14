@@ -60,7 +60,7 @@ export function createDiceView(root, { nameOf }) {
         rollTo(meta.roll.value);
         pulse(result);
       } else if (meta?.type === 'reset') {
-        if (valBadge) valBadge.textContent = '4';
+        if (valBadge) valBadge.textContent = state.lastRoll ? String(state.lastRoll.value) : '4';
       }
     },
   };

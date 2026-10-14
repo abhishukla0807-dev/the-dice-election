@@ -21,7 +21,7 @@ const { history, nameOf, sideOf } = Astro.props;
   .roll-log {
     width: 100%;
     max-width: 35rem;
-    padding: 1.25rem 1.75rem;
+    padding: clamp(1rem, 3.5vw, 1.75rem);
     border-radius: var(--radius-md);
     background: var(--color-surface);
     box-shadow: var(--shadow-card);

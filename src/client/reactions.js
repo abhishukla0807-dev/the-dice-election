@@ -184,12 +184,13 @@ export function createReactionsView(root, { candidateIds = [], nameOf = (id) => 
         parts.push(`❤️ ${nameOf(mostHearts.id)} leads in Hearts (${mostHearts.count})`);
       }
       if (mostLikes && mostLikes.count > 0) {
-        parts.push(`👍 ${nameOf(mostLikes.id)} leads in Likes (${mostLikes.count})`);
+        parts.push(`👎 ${nameOf(mostLikes.id)} leads in Dislikes (${mostLikes.count})`);
       }
       if (parts.length > 0) {
         tallyTextEl.textContent = parts.join(' • ');
       } else {
-        tallyTextEl.textContent = 'Audience Votes: Tap ❤️ Heart or 👍 Like on any candidate below';
+        tallyTextEl.textContent =
+          'Audience Votes: Tap ❤️ Heart or 👎 Dislike on any candidate below';
       }
     }
   }
@@ -222,7 +223,7 @@ export function createReactionsView(root, { candidateIds = [], nameOf = (id) => 
       btn.classList.add('is-clicked');
       setTimeout(() => btn.classList.remove('is-clicked'), 250);
 
-      const emoji = reactionType === 'heart' ? '❤️' : '👍';
+      const emoji = reactionType === 'heart' ? '❤️' : '👎';
       spawnFloatingParticle(btn, emoji);
 
       // Thread-safe update

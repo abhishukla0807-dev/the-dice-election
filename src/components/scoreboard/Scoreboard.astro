@@ -96,22 +96,32 @@ const nameOf = (id) => candidates.find((c) => c.id === id)?.name ?? id;
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
-    padding: 1.25rem 1.75rem;
-    border-radius: var(--radius-xl);
+    padding: clamp(0.875rem, 3.5vw, 1.75rem);
+    border-radius: var(--radius-lg);
     background: #0f1117;
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
     overflow: hidden;
   }
 
-  /* Minimal Top Header */
+  /* Minimal Top Header - Mobile First */
   .board__header {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    padding-bottom: 0.75rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding-bottom: 0.625rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  @media (min-width: 521px) {
+    .board__header {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding-bottom: 0.75rem;
+    }
   }
 
   .board__status {
@@ -256,12 +266,15 @@ const nameOf = (id) => candidates.find((c) => c.id === id)?.name ?? id;
     opacity: 1;
   }
 
-  /* Score Arena */
+  /* Score Arena - Mobile First */
   .board__arena {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'left right'
+      'mid mid';
     align-items: center;
-    gap: var(--space-md);
+    gap: 0.75rem;
   }
 
   .board__side-col {
@@ -269,7 +282,16 @@ const nameOf = (id) => candidates.find((c) => c.id === id)?.name ?? id;
     justify-content: center;
   }
 
+  .board__side-col:first-child {
+    grid-area: left;
+  }
+
+  .board__side-col:last-child {
+    grid-area: right;
+  }
+
   .board__mid {
+    grid-area: mid;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -277,7 +299,7 @@ const nameOf = (id) => candidates.find((c) => c.id === id)?.name ?? id;
   }
 
   .board__chip {
-    padding: 0.35rem 0.85rem;
+    padding: 0.3rem 0.75rem;
     border-radius: var(--radius-pill);
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.12);
@@ -285,6 +307,7 @@ const nameOf = (id) => candidates.find((c) => c.id === id)?.name ?? id;
     font-size: 0.75rem;
     font-weight: 700;
     text-align: center;
+    max-width: 100%;
   }
 
   .board__roll {
@@ -295,30 +318,23 @@ const nameOf = (id) => candidates.find((c) => c.id === id)?.name ?? id;
     text-transform: uppercase;
   }
 
-  @media (max-width: 520px) {
-    .board {
-      padding: 1rem;
-    }
-    .board__header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
-    }
+  @media (min-width: 521px) {
     .board__arena {
-      grid-template-columns: 1fr 1fr;
-      grid-template-areas:
-        'left right'
-        'mid mid';
-      gap: 0.75rem;
+      grid-template-columns: 1fr auto 1fr;
+      grid-template-areas: none;
+      gap: var(--space-md);
     }
     .board__side-col:first-child {
-      grid-area: left;
+      grid-area: auto;
     }
     .board__side-col:last-child {
-      grid-area: right;
+      grid-area: auto;
     }
     .board__mid {
-      grid-area: mid;
+      grid-area: auto;
+    }
+    .board__chip {
+      padding: 0.35rem 0.85rem;
     }
   }
 

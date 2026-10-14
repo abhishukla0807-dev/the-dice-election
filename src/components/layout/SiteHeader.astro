@@ -1,0 +1,106 @@
+---
+import { Image } from 'astro:assets';
+import logoImage from '../../assets/images/ui/logo.png';
+import { site } from '../../config/site.js';
+import { matchups } from '../../data/matchups.js';
+import { matchupHref } from '../../utils/routes.js';
+
+const { currentSlug } = Astro.props;
+---
+
+<header class="site-header container">
+  <a class="site-header__brand" href="/" aria-label={`${site.name} Home`}>
+    <Image
+      src={logoImage}
+      alt=""
+      class="site-header__logo"
+      width={48}
+      height={29}
+      loading="eager"
+      decoding="async"
+    />
+    <span class="site-header__brand-text">{site.name}</span>
+  </a>
+  <nav class="site-header__nav" aria-label="Matchups">
+    <ul>
+      {matchups.map((m) => (
+        <li>
+          <a href={matchupHref(m)} aria-current={m.slug === currentSlug ? 'page' : undefined}>
+            {m.navLabel}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+  <p class="site-header__live">
+    <span aria-hidden="true"></span>Live round
+  </p>
+</header>
+
+<style>
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm) var(--space-lg);
+    padding-block: 0.75rem;
+  }
+  .site-header__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    color: var(--color-ink);
+  }
+  .site-header__logo {
+    width: auto;
+    height: 1.875rem;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .site-header__brand:hover .site-header__logo {
+    transform: rotate(-10deg) scale(1.12);
+  }
+  .site-header__nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-lg);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-ink-muted);
+  }
+  .site-header__nav a {
+    padding-block: var(--space-xs);
+  }
+  .site-header__nav a:hover,
+  .site-header__nav a[aria-current='page'] {
+    color: var(--color-ink);
+  }
+  .site-header__nav a[aria-current='page'] {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 2px;
+  }
+  .site-header__live {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) 0.875rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-live-bg);
+    color: var(--color-live-ink);
+    font-size: var(--fs-small);
+    font-weight: 700;
+  }
+  .site-header__live span {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--color-live-dot);
+  }
+</style>

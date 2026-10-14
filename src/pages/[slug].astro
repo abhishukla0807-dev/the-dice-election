@@ -1,0 +1,20 @@
+---
+import Backdrop from '../components/ui/Backdrop.astro';
+import Matchup from '../components/Matchup.astro';
+import backdrop from '../assets/images/ui/backdrop.png';
+import { matchups } from '../data/matchups.js';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+export function getStaticPaths() {
+  return matchups
+    .filter((m) => !m.isHome)
+    .map((matchup) => ({ params: { slug: matchup.slug }, props: { matchup } }));
+}
+
+const { matchup } = Astro.props;
+---
+
+<BaseLayout title={matchup.title} currentSlug={matchup.slug}>
+  <Backdrop slot="backdrop" src={backdrop} />
+  <Matchup matchup={matchup} />
+</BaseLayout>

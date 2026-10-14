@@ -1,0 +1,242 @@
+---
+import { Image } from 'astro:assets';
+import diceImage from '../../assets/images/ui/dice.png';
+import { nextRollText, rollResultText } from '../../shared/presenters.js';
+
+const { state, nameOf, intervalSeconds } = Astro.props;
+const initialValue = state.lastRoll?.value ?? 4;
+---
+
+<section class="dice" aria-label="Dice Roller">
+  <div class="dice__stage" data-dice-stage aria-hidden="true">
+    <div class="dice__wrapper" data-dice-wrapper>
+      <div class="dice__graphic" data-dice-graphic data-val={initialValue}>
+        <Image
+          src={diceImage}
+          alt="Election Dice"
+          width={96}
+          height={96}
+          class="dice__img"
+          loading="eager"
+        />
+        <span class="dice__val-badge" data-dice-val-badge aria-label={`Rolled ${initialValue}`}>
+          {initialValue}
+        </span>
+      </div>
+    </div>
+    <div class="dice__shadow" data-dice-shadow></div>
+  </div>
+
+  <div class="dice__controls">
+    <button
+      type="button"
+      class="dice__btn dice__btn--sound"
+      data-sound-toggle
+      title="Toggle Roll Sound"
+    >
+      <span data-sound-icon aria-hidden="true">
+        🔊
+      </span>
+      <span data-sound-label>Sound On</span>
+    </button>
+  </div>
+
+  <p class="dice__result" data-dice-result aria-live="polite">
+    {rollResultText(state, nameOf)}
+  </p>
+
+  <p class="dice__countdown">
+    <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true">
+      <circle cx="18" cy="18" r="15" fill="none" stroke="#e5e7eb" stroke-width="4"></circle>
+      <circle
+        data-countdown-ring
+        cx="18"
+        cy="18"
+        r="15"
+        fill="none"
+        stroke="#111827"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-dasharray="94"
+        stroke-dashoffset="0"
+        transform="rotate(-90 18 18)"
+      ></circle>
+    </svg>
+    <span>
+      Turn clock: <span data-countdown-seconds>0</span> / {intervalSeconds}s
+    </span>
+  </p>
+
+  <p class="dice__next" data-dice-next>
+    {nextRollText(state, nameOf)}
+  </p>
+</section>
+
+<style>
+  .dice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  .dice__stage {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .dice__wrapper {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  .dice__stage:hover .dice__graphic {
+    transform: scale(1.08) rotate(-4deg);
+  }
+  .dice__graphic {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .dice__img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.18));
+    display: block;
+    user-select: none;
+    pointer-events: none;
+  }
+  .dice__val-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 6px;
+    border-radius: var(--radius-pill);
+    background: #0f172a;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    font-variant-numeric: tabular-nums;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Rolling & Tumble Animation */
+  .dice__stage.is-rolling .dice__graphic {
+    animation: dice-tumble 0.85s cubic-bezier(0.2, 0.85, 0.35, 1);
+  }
+  @keyframes dice-tumble {
+    0% {
+      transform: translateY(0) rotate(0deg) scale(1);
+    }
+    30% {
+      transform: translateY(-42px) rotate(-140deg) scale(1.15);
+    }
+    60% {
+      transform: translateY(-16px) rotate(-280deg) scale(1.08);
+    }
+    85% {
+      transform: translateY(0) rotate(-360deg) scale(1.06, 0.94);
+    }
+    100% {
+      transform: translateY(0) rotate(-360deg) scale(1);
+    }
+  }
+
+  .dice__shadow {
+    position: absolute;
+    bottom: 2px;
+    width: 82px;
+    height: 16px;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(15, 17, 21, 0.4) 0%,
+      rgba(15, 17, 21, 0) 70%
+    );
+    border-radius: 50%;
+    transition: all 0.85s cubic-bezier(0.2, 0.9, 0.3, 1);
+    z-index: 1;
+  }
+  .dice__stage.is-rolling .dice__shadow {
+    animation: shadow-shrink 0.85s cubic-bezier(0.2, 0.85, 0.35, 1);
+  }
+  @keyframes shadow-shrink {
+    0% {
+      transform: scale(1);
+      opacity: 0.4;
+    }
+    30% {
+      transform: scale(0.55);
+      opacity: 0.15;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0.4;
+    }
+  }
+
+  .dice__controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+  .dice__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.15s ease;
+  }
+  .dice__btn:hover {
+    background: var(--color-line-soft);
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+  }
+
+  .dice__result {
+    font-size: var(--fs-lead);
+    font-weight: 800;
+  }
+  .dice__countdown {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-weight: 700;
+  }
+  .dice__countdown circle[data-countdown-ring] {
+    transition: stroke-dashoffset 1s linear;
+  }
+  .dice__next {
+    color: var(--color-ink-muted);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+</style>

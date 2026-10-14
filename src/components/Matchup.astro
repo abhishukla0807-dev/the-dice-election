@@ -1,0 +1,196 @@
+---
+import { gameDefaults } from '../config/site.js';
+import { createMatch } from '../core/match.js';
+import { roundRobin } from '../core/turn-policies.js';
+import CandidateCard from './candidate/CandidateCard.astro';
+import DiceRoller from './dice/DiceRoller.astro';
+import RollLog from './log/RollLog.astro';
+import Scoreboard from './scoreboard/Scoreboard.astro';
+
+const { matchup } = Astro.props;
+const rules = { ...gameDefaults, ...matchup.rules };
+const { candidates } = matchup;
+const ids = candidates.map((c) => c.id);
+
+// Same state machine the browser runs, so server HTML and client agree.
+const state = createMatch({
+  candidateIds: ids,
+  target: rules.target,
+  historyLimit: rules.historyLimit,
+  turnPolicy: roundRobin(ids),
+  initial: matchup.initial,
+}).state;
+
+const nameOf = (id) => candidates.find((c) => c.id === id)?.name ?? id;
+const sideOf = (id) => (ids.indexOf(id) === 0 ? 'left' : 'right');
+
+const clientConfig = {
+  slug: matchup.slug,
+  target: rules.target,
+  sides: rules.sides,
+  historyLimit: rules.historyLimit,
+  rollIntervalSeconds: rules.rollIntervalSeconds,
+  candidates: candidates.map(({ id, name }) => ({ id, name, side: sideOf(id) })),
+  initial: matchup.initial,
+};
+---
+
+<section
+  class="matchup"
+  data-election-app
+  data-config={JSON.stringify(clientConfig)}
+  style={`--left-accent:${candidates[0].theme.accent};--right-accent:${candidates[1].theme.accent}`}
+>
+  <header class="matchup__intro">
+    <div class="matchup__badge">
+      <span class="badge-dot" aria-hidden="true"></span>
+      <span>LIVE SHOWDOWN</span>
+    </div>
+    <h1>
+      <span>{candidates[0].shortName}</span>
+      <span class="matchup__vs" aria-label="versus">
+        VS
+      </span>
+      <span>{candidates[1].shortName}</span>
+    </h1>
+    <p>Endless Dice Battle &bull; Scores Increase Every Roll</p>
+  </header>
+
+  <Scoreboard candidates={candidates} state={state} target={rules.target} />
+
+  <div class="reactions-tally" data-reactions-tally aria-live="polite">
+    <span class="tally-icon" aria-hidden="true">
+      💖
+    </span>
+    <span class="tally-text" data-reactions-tally-text>
+      Audience Votes: Tap ❤️ Heart or 👍 Like on any candidate below
+    </span>
+  </div>
+
+  <div class="matchup__cards">
+    {candidates.map((candidate) => (
+      <CandidateCard candidate={candidate} state={state} />
+    ))}
+  </div>
+
+  <DiceRoller state={state} nameOf={nameOf} intervalSeconds={rules.rollIntervalSeconds} />
+
+  <RollLog history={state.history} nameOf={nameOf} sideOf={sideOf} />
+</section>
+
+<style>
+  .matchup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xl);
+  }
+  .matchup > :global(.board),
+  .matchup__cards {
+    width: 100%;
+  }
+  .matchup__intro {
+    max-width: 44rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .matchup__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-pill);
+    background: rgba(37, 99, 235, 0.08);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    color: #2563eb;
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+  }
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #2563eb;
+    box-shadow: 0 0 6px #2563eb;
+    animation: badge-pulse 1.8s infinite;
+  }
+  @keyframes badge-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.4;
+      transform: scale(0.8);
+    }
+  }
+  .matchup__intro h1 {
+    font-size: clamp(1.5rem, 3.5vw, 2.35rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    color: var(--color-ink);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem 0.5rem;
+    margin: 0;
+  }
+  .matchup__vs {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-pill);
+    background: #111827;
+    color: #f8fafc;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+  .matchup__intro p {
+    margin-top: 0.25rem;
+    color: var(--color-ink-muted);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .matchup__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: var(--space-lg);
+  }
+  .reactions-tally {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 1.1rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    font-size: 0.8125rem;
+    color: var(--color-ink-muted);
+    font-weight: 600;
+  }
+  .tally-icon {
+    font-size: 1rem;
+  }
+  .tally-text {
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+</style>
+
+<script>
+  import '../client/main.js';
+</script>

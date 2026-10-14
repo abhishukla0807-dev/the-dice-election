@@ -1,0 +1,399 @@
+---
+import { Image } from 'astro:assets';
+import { cardLeadText, cardStatus } from '../../shared/presenters.js';
+import PartySymbol from '../ui/PartySymbol.astro';
+
+const { candidate, state } = Astro.props;
+const { id, name, party, theme } = candidate;
+const score = state.scores[id] ?? 0;
+const status = cardStatus(state, id);
+const isNext = state.nextId === id;
+---
+
+<article
+  class="card"
+  data-card={id}
+  data-next={String(isNext)}
+  data-winner={String(state.winnerId === id)}
+  style={`--accent:${theme.accent};--tint:${theme.tint};--bar:${theme.bar}`}
+>
+  <div class="card__turn-banner" data-card-turn-banner aria-hidden={String(!isNext)}>
+    <span class="blinking-green-light" aria-hidden="true">
+      <span class="blinking-green-light__bulb"></span>
+      <span class="blinking-green-light__flare"></span>
+    </span>
+    <span class="card__turn-text">TURN TO ROLL</span>
+  </div>
+
+  <div class="card__head">
+    <div class="card__identity">
+      <Image
+        class="card__photo"
+        src={candidate.photo}
+        alt={name}
+        width={120}
+        height={120}
+        densities={[1, 2]}
+        fit="cover"
+        position={candidate.crop}
+        format="webp"
+        quality={75}
+        loading="eager"
+        decoding="async"
+      />
+      <div>
+        <h2 class="card__name">{name}</h2>
+        <p class="card__party">{party.name}</p>
+      </div>
+    </div>
+    <PartySymbol symbol={party.symbol} />
+  </div>
+
+  <div class="card__meta">
+    <p class="card__status" data-tone={status.tone} data-card-status>
+      {status.label}
+    </p>
+    <p class="card__score">
+      <span class="card__score-value" data-card-score>
+        {score}
+      </span>
+    </p>
+  </div>
+
+  <p class="card__foot">
+    <span data-card-lead>{cardLeadText(state, id)}</span>
+  </p>
+
+  <div class="card__reactions">
+    <div class="card__reaction-badges">
+      <span
+        class="reaction-leader-badge reaction-leader-badge--heart"
+        data-leader-badge="heart"
+        data-candidate-id={id}
+        style="display: none;"
+      >
+        ❤️ Most Loved
+      </span>
+      <span
+        class="reaction-leader-badge reaction-leader-badge--like"
+        data-leader-badge="like"
+        data-candidate-id={id}
+        style="display: none;"
+      >
+        👍 Most Liked
+      </span>
+    </div>
+
+    <div class="card__reaction-actions">
+      <button
+        type="button"
+        class="reaction-btn reaction-btn--heart"
+        data-reaction-btn="heart"
+        data-candidate-id={id}
+        title={`Heart ${name}`}
+        aria-label={`Heart ${name}`}
+      >
+        <span class="reaction-icon" aria-hidden="true">
+          ❤️
+        </span>
+        <span class="reaction-text">Heart</span>
+        <span class="reaction-counter" data-reaction-count="heart" data-candidate-id={id}>
+          0
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="reaction-btn reaction-btn--like"
+        data-reaction-btn="like"
+        data-candidate-id={id}
+        title={`Like ${name}`}
+        aria-label={`Like ${name}`}
+      >
+        <span class="reaction-icon" aria-hidden="true">
+          👍
+        </span>
+        <span class="reaction-text">Like</span>
+        <span class="reaction-counter" data-reaction-count="like" data-candidate-id={id}>
+          0
+        </span>
+      </button>
+    </div>
+  </div>
+</article>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    padding: var(--space-lg);
+    border: 2px solid transparent;
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+    transition: all 0.3s ease;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .card[data-next='true'] {
+    border-color: #22c55e;
+    box-shadow:
+      0 0 0 3px rgba(34, 197, 94, 0.25),
+      0 16px 36px rgba(34, 197, 94, 0.18);
+  }
+  .card[data-next='true'] .card__photo {
+    border-color: #22c55e !important;
+    box-shadow: 0 0 16px rgba(34, 197, 94, 0.5);
+  }
+  .card[data-winner='true'] {
+    border-color: var(--accent);
+  }
+  .card[data-daily-winner='true'] {
+    border-color: #f59e0b;
+    box-shadow:
+      0 0 0 3px rgba(245, 158, 11, 0.35),
+      0 16px 40px rgba(245, 158, 11, 0.22);
+  }
+  .card[data-daily-winner='true'] .card__photo {
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 22px rgba(245, 158, 11, 0.65);
+  }
+  .card__turn-banner {
+    display: none;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.875rem;
+    background: #ecfdf5;
+    border: 1.5px solid #86efac;
+    border-radius: var(--radius-sm);
+    color: #15803d;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.12);
+  }
+  .card[data-next='true'] .card__turn-banner {
+    display: flex;
+  }
+  .card[data-winner='true'] .card__turn-banner {
+    display: none;
+  }
+  .blinking-green-light {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+  }
+  .blinking-green-light__bulb {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow:
+      0 0 10px #22c55e,
+      0 0 20px #22c55e;
+    animation: green-light-blink 0.85s ease-in-out infinite alternate;
+  }
+  .blinking-green-light__flare {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.5);
+    animation: green-light-flare 1.7s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+  }
+  @keyframes green-light-blink {
+    0% {
+      opacity: 0.3;
+      transform: scale(0.85);
+      box-shadow: 0 0 4px #22c55e;
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1.15);
+      box-shadow:
+        0 0 14px #22c55e,
+        0 0 26px rgba(34, 197, 94, 0.9);
+    }
+  }
+  @keyframes green-light-flare {
+    0% {
+      transform: scale(0.7);
+      opacity: 0.9;
+    }
+    100% {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+  .card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+  }
+  .card__identity {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    min-width: 0;
+  }
+  .card__photo {
+    flex: none;
+    width: clamp(5rem, 22vw, 7.5rem);
+    height: auto;
+    aspect-ratio: 1;
+    border: 4px solid var(--tint);
+    border-radius: 50%;
+    object-fit: cover;
+    transition: all 0.3s ease;
+  }
+  .card__name {
+    font-size: var(--fs-name);
+    font-weight: 800;
+    line-height: 1.2;
+  }
+  .card__party {
+    margin-top: var(--space-2xs);
+    color: var(--color-ink-muted);
+    font-size: var(--fs-small);
+    font-weight: 600;
+  }
+  .card__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-xs);
+  }
+  .card__status {
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-line-soft);
+    color: var(--color-ink-muted);
+    font-size: 0.8125rem;
+    font-weight: 700;
+  }
+  .card__status[data-tone='next'],
+  .card__status[data-tone='winner'] {
+    background: var(--tint);
+    color: var(--accent);
+  }
+  .card__score {
+    font-size: 1.75rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-ink);
+  }
+  .card__foot {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-md);
+    color: var(--color-ink-muted);
+    font-size: var(--fs-small);
+    font-weight: 600;
+  }
+
+  /* Reactions & Leader Badges */
+  .card__reactions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--color-line-soft);
+  }
+  .card__reaction-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    min-height: 1.25rem;
+  }
+  .reaction-leader-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    animation: badgePop 0.25s ease-out;
+  }
+  @keyframes badgePop {
+    from {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  .reaction-leader-badge--heart {
+    background: #fdf2f8;
+    border: 1px solid #fbcfe8;
+    color: #db2777;
+    box-shadow: 0 1px 4px rgba(219, 39, 119, 0.12);
+  }
+  .reaction-leader-badge--like {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #2563eb;
+    box-shadow: 0 1px 4px rgba(37, 99, 235, 0.12);
+  }
+  .card__reaction-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .reaction-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 0.45rem 0.625rem;
+    border-radius: var(--radius-md);
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #1e293b;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .reaction-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+  }
+  .reaction-btn:active,
+  .reaction-btn.is-clicked {
+    transform: scale(0.94);
+  }
+  .reaction-btn--heart:hover {
+    background: #fdf2f8;
+    border-color: #f472b6;
+    color: #be185d;
+  }
+  .reaction-btn--like:hover {
+    background: #eff6ff;
+    border-color: #60a5fa;
+    color: #1d4ed8;
+  }
+  .reaction-icon {
+    font-size: 0.9375rem;
+    line-height: 1;
+  }
+  .reaction-counter {
+    padding: 0.1rem 0.45rem;
+    border-radius: var(--radius-pill);
+    background: rgba(0, 0, 0, 0.05);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

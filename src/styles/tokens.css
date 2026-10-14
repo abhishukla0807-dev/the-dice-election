@@ -1,0 +1,47 @@
+:root {
+  color-scheme: light;
+
+  --color-bg: #f5f6f8;
+  --color-surface: #ffffff;
+  --color-ink: #111827;
+  --color-ink-muted: #4b5563;
+  --color-ink-subtle: #6b7280;
+  --color-line: #e5e7eb;
+  --color-line-soft: #f3f4f6;
+  --color-board: #0f1115;
+  --color-board-muted: #9ca3af;
+  --color-live-bg: #dcfce7;
+  --color-live-ink: #166534;
+  --color-live-dot: #16a34a;
+
+  --font-sans:
+    'Manrope Variable', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+
+  --fs-small: 0.875rem;
+  --fs-body: 1rem;
+  --fs-lead: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
+  --fs-h1: clamp(2rem, 1.4rem + 2.6vw, 3rem);
+  --fs-name: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --fs-score: clamp(3.5rem, 2rem + 8vw, 7rem);
+
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 3rem;
+
+  --radius-sm: 0.625rem;
+  --radius-md: 1.25rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 1.75rem;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 8px 28px rgb(17 24 39 / 0.06);
+  --shadow-board: 0 24px 48px rgb(17 24 39 / 0.18);
+
+  --container: 75rem;
+  --gutter: clamp(1rem, 4vw, 3rem);
+}

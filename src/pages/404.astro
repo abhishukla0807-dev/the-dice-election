@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page not found | The Dice Election">
+  <section class="not-found">
+    <h1>Page not found</h1>
+    <p>
+      <a href="/">Back to the dice election</a>
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    padding-block: var(--space-2xl);
+    text-align: center;
+  }
+  .not-found p {
+    margin-top: var(--space-md);
+    text-decoration: underline;
+  }
+</style>

@@ -1,0 +1,45 @@
+---
+const { label, value, max } = Astro.props;
+const ratio = Math.min(1, value / max);
+---
+
+<div
+  class="progress"
+  role="progressbar"
+  aria-label={label}
+  aria-valuemin="0"
+  aria-valuemax={max}
+  aria-valuenow={Math.min(value, max)}
+  data-card-track
+>
+  <div class="progress__fill" style={`--progress:${ratio}`} data-card-fill></div>
+  <div class="progress__ticks"></div>
+</div>
+
+<style>
+  .progress {
+    position: relative;
+    height: 0.625rem;
+    overflow: hidden;
+    border-radius: var(--radius-pill);
+    background: var(--color-line);
+  }
+  .progress__fill {
+    height: 100%;
+    background: var(--bar);
+    transform: scaleX(var(--progress, 0));
+    transform-origin: left center;
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .progress__ticks {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent calc(10% - 2px),
+      #fff calc(10% - 2px),
+      #fff 10%
+    );
+  }
+</style>

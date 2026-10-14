@@ -1,0 +1,28 @@
+---
+import { Image } from 'astro:assets';
+
+const { symbol } = Astro.props;
+---
+
+<Image
+  class="party-symbol"
+  src={symbol.src}
+  alt={symbol.alt}
+  width={symbol.width}
+  height={symbol.height}
+  densities={[1, 2]}
+  format="webp"
+  loading="eager"
+  decoding="async"
+/>
+
+<style>
+  .party-symbol {
+    flex: none;
+    width: auto;
+    max-width: 5.5rem;
+    height: auto;
+    max-height: 5.5rem;
+    object-fit: contain;
+  }
+</style>

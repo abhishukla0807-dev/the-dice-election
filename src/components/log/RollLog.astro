@@ -1,0 +1,51 @@
+---
+const { history, nameOf, sideOf } = Astro.props;
+---
+
+<section class="roll-log" aria-labelledby="roll-log-title">
+  <h2 id="roll-log-title" class="roll-log__title">
+    Recent rolls
+  </h2>
+  <ol data-roll-log>
+    {history.map((entry) => (
+      <li class="roll-log__row" data-side={sideOf(entry.id)}>
+        <span>{nameOf(entry.id)}</span>
+        <span class="roll-log__value">+{entry.value}</span>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<!-- Global on purpose: rows are also created at runtime by roll-log-view.js. -->
+<style is:global>
+  .roll-log {
+    width: 100%;
+    max-width: 35rem;
+    padding: 1.25rem 1.75rem;
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+  }
+  .roll-log__title {
+    margin-bottom: var(--space-xs);
+    color: var(--color-ink-subtle);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .roll-log__row {
+    display: flex;
+    justify-content: space-between;
+    padding-block: 0.625rem;
+    border-top: 1px solid var(--color-line-soft);
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+  .roll-log__row[data-side='left'] .roll-log__value {
+    color: var(--left-accent);
+  }
+  .roll-log__row[data-side='right'] .roll-log__value {
+    color: var(--right-accent);
+  }
+</style>

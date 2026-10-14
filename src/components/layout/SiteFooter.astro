@@ -1,0 +1,45 @@
+---
+import { Image } from 'astro:assets';
+import logoImage from '../../assets/images/ui/logo.png';
+import { site } from '../../config/site.js';
+---
+
+<footer class="site-footer container">
+  <div class="site-footer__brand">
+    <Image src={logoImage} alt="" class="site-footer__logo" width={32} height={19} />
+    <span>{site.name}</span>
+  </div>
+  <p>{site.disclaimer}</p>
+</footer>
+
+<style>
+  .site-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    padding-block: var(--space-xl) var(--space-2xl);
+    text-align: center;
+    color: var(--color-ink-subtle);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+  .site-footer__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-weight: 700;
+    color: var(--color-ink-muted);
+    font-size: 0.9375rem;
+  }
+  .site-footer__logo {
+    width: auto;
+    height: 1.25rem;
+    object-fit: contain;
+    opacity: 0.85;
+  }
+  .site-footer p {
+    max-width: 32.5rem;
+    margin-inline: auto;
+  }
+</style>

@@ -1,0 +1,97 @@
+---
+const { candidate, score, isNext = false } = Astro.props;
+---
+
+<div
+  class="side"
+  data-sb-side={candidate.id}
+  data-next={String(isNext)}
+  style={`--dot:${candidate.theme.dot};--accent:${candidate.theme.accent}`}
+>
+  <div class="side__identity">
+    <span class="side__green-light" aria-hidden="true"></span>
+    <span class="side__dot" aria-hidden="true"></span>
+    <span class="side__name">{candidate.shortName}</span>
+  </div>
+  <p class="side__score" data-sb-score={candidate.id}>
+    {score}
+  </p>
+</div>
+
+<style>
+  .side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    padding: 0.5rem;
+  }
+  .side__identity {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .side__name {
+    color: var(--color-board-muted);
+    font-size: 0.8125rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+  }
+  .side__green-light {
+    display: none;
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow:
+      0 0 10px #22c55e,
+      0 0 18px #22c55e;
+    animation: side-green-blink 0.85s ease-in-out infinite alternate;
+  }
+  .side[data-next='true'] .side__green-light {
+    display: inline-block;
+  }
+  .side[data-next='true'] .side__name {
+    color: #4ade80;
+  }
+  @keyframes side-green-blink {
+    0% {
+      opacity: 0.35;
+      transform: scale(0.85);
+      box-shadow: 0 0 4px #22c55e;
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1.2);
+      box-shadow:
+        0 0 12px #22c55e,
+        0 0 20px rgba(34, 197, 94, 0.9);
+    }
+  }
+  .side__dot {
+    flex: none;
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 50%;
+    background: var(--dot);
+    box-shadow: 0 0 8px var(--dot);
+  }
+  .side__score {
+    font-size: clamp(3rem, 6vw, 4.5rem);
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: #ffffff;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .side[data-next='true'] .side__score {
+    color: #f8fafc;
+  }
+</style>

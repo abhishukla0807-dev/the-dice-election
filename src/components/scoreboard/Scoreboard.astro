@@ -1,0 +1,358 @@
+---
+import { leadChipText, rollLabel } from '../../shared/presenters.js';
+import ScoreboardSide from './ScoreboardSide.astro';
+
+const { candidates, state } = Astro.props;
+const [left, right] = candidates;
+const nameOf = (id) => candidates.find((c) => c.id === id)?.name ?? id;
+---
+
+<section class="board" aria-label="Scoreboard">
+  <!-- Minimal Top Header: live status & IST countdown -->
+  <div class="board__header">
+    <div class="board__status">
+      <span class="pulse-dot" aria-hidden="true"></span>
+      <span class="status-live">LIVE</span>
+      <span class="status-sep" aria-hidden="true">
+        &bull;
+      </span>
+      <span class="status-time">
+        Day ends 23:59 IST (<span data-ist-timer>--:--:--</span>)
+      </span>
+    </div>
+
+    <button
+      type="button"
+      class="board__sim-btn"
+      data-test-midnight-btn
+      title="Simulate end of day (Midnight IST)"
+    >
+      Simulate End of Day
+    </button>
+  </div>
+
+  <!-- Winner Announcement Banner (Only visible when triggered/midnight; dismissible) -->
+  <div class="board__winner" data-daily-winner-banner style="display: none;" role="status">
+    <div class="board__winner-content">
+      <span class="winner-trophy" aria-hidden="true">
+        🏆
+      </span>
+      <div class="winner-text">
+        <span class="winner-tag">Official Winner of the Day (IST)</span>
+        <strong class="winner-name" data-winner-name>
+          Candidate Name
+        </strong>
+      </div>
+      <span class="winner-score" data-winner-score>
+        0 pts
+      </span>
+    </div>
+    <button
+      type="button"
+      class="winner-close"
+      data-winner-dismiss
+      aria-label="Dismiss winner banner"
+      title="Dismiss"
+    >
+      &times;
+    </button>
+  </div>
+
+  <!-- Score Arena -->
+  <div class="board__arena">
+    <div class="board__side-col">
+      <ScoreboardSide
+        candidate={left}
+        score={state.scores[left.id]}
+        isNext={state.nextId === left.id}
+      />
+    </div>
+
+    <div class="board__mid">
+      <p class="board__chip" data-sb-chip>
+        {leadChipText(state, nameOf)}
+      </p>
+      <span class="board__roll" data-sb-roll>
+        {rollLabel(state)}
+      </span>
+    </div>
+
+    <div class="board__side-col">
+      <ScoreboardSide
+        candidate={right}
+        score={state.scores[right.id]}
+        isNext={state.nextId === right.id}
+      />
+    </div>
+  </div>
+
+  <!-- Particle Confetti Container -->
+  <div class="confetti-container" data-confetti-container aria-hidden="true"></div>
+</section>
+
+<style>
+  .board {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: 1.25rem 1.75rem;
+    border-radius: var(--radius-xl);
+    background: #0f1117;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+  }
+
+  /* Minimal Top Header */
+  .board__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .board__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.75rem;
+    color: #94a3b8;
+  }
+
+  .pulse-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 8px #22c55e;
+    animation: pulse-ring 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse-ring {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.4;
+      transform: scale(0.85);
+    }
+  }
+
+  .status-live {
+    font-weight: 800;
+    color: #4ade80;
+    letter-spacing: 0.05em;
+  }
+
+  .status-sep {
+    color: rgba(255, 255, 255, 0.2);
+  }
+
+  .status-time {
+    font-weight: 500;
+    color: #cbd5e1;
+  }
+
+  .board__sim-btn {
+    font-size: 0.6875rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #94a3b8;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .board__sim-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+
+  /* Winner Announcement - minimal & dismissible */
+  .board__winner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.625rem 1rem;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.08) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.12);
+    animation: fadeIn 0.2s ease-out;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .board__winner-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .winner-trophy {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .winner-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .winner-tag {
+    font-size: 0.625rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: #fbbf24;
+    text-transform: uppercase;
+  }
+
+  .winner-name {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #ffffff;
+  }
+
+  .winner-score {
+    font-size: 0.875rem;
+    font-weight: 800;
+    color: #fbbf24;
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-sm);
+    background: rgba(245, 158, 11, 0.2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .winner-close {
+    background: transparent;
+    border: none;
+    color: #fbbf24;
+    font-size: 1.25rem;
+    line-height: 1;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    border-radius: 4px;
+    opacity: 0.75;
+    transition: opacity 0.15s ease;
+  }
+  .winner-close:hover {
+    opacity: 1;
+  }
+
+  /* Score Arena */
+  .board__arena {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  .board__side-col {
+    display: flex;
+    justify-content: center;
+  }
+
+  .board__mid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .board__chip {
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .board__roll {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: #64748b;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 520px) {
+    .board {
+      padding: 1rem;
+    }
+    .board__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .board__arena {
+      grid-template-columns: 1fr 1fr;
+      grid-template-areas:
+        'left right'
+        'mid mid';
+      gap: 0.75rem;
+    }
+    .board__side-col:first-child {
+      grid-area: left;
+    }
+    .board__side-col:last-child {
+      grid-area: right;
+    }
+    .board__mid {
+      grid-area: mid;
+    }
+  }
+
+  /* Confetti Container */
+  .confetti-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 10;
+  }
+  :global(.confetti-particle) {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 10px;
+    background: var(--color, #f59e0b);
+    border-radius: 2px;
+    opacity: 0;
+    animation: confetti-burst 2.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    animation-delay: var(--delay, 0s);
+  }
+  @keyframes confetti-burst {
+    0% {
+      opacity: 1;
+      transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+    70% {
+      opacity: 0.9;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--x, 0), var(--y, 0)) rotate(var(--rot, 360deg)) scale(0.5);
+    }
+  }
+</style>

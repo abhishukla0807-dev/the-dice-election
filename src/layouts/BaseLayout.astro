@@ -1,0 +1,38 @@
+---
+import '@fontsource-variable/manrope/wght.css';
+import latinFont from '@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2?url';
+import SiteFooter from '../components/layout/SiteFooter.astro';
+import SiteHeader from '../components/layout/SiteHeader.astro';
+import { site } from '../config/site.js';
+import '../styles/tokens.css';
+import '../styles/base.css';
+
+const { title, description = site.description, currentSlug } = Astro.props;
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+---
+
+<!doctype html>
+<html lang={site.locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content={site.themeColor} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href={latinFont} as="font" type="font/woff2" crossorigin />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+  </head>
+  <body>
+    <slot name="backdrop" />
+    <SiteHeader currentSlug={currentSlug} />
+    <main class="container">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>
